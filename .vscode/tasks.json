@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run",
+			"type": "process",
+			"command": "bash",
+			"args": [
+				"-c",
+				"./bin/love --console .",
+			],
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal":"silent",
+				"panel": "dedicated",
+				"focus": true,
+				// "close": true
+			},
+			"problemMatcher": []
+		}
+	]
+}
