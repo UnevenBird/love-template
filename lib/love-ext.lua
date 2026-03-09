@@ -3,11 +3,21 @@ local min, max = math.min, math.max
 
 local M = {}
 
-M.appendRecuirePaths = function(p)
-	local list = {}
-	for path in package.path:gmatch("[^;]+") do
-		table.insert(list, path)
+M.split = function(str, delim)
+	if str == "" then return {} end
+	local result = {}
+	local append = delim
+	if delim:match("%%") then
+		append = delim:gsub("%%", "")
 	end
+	for match in (str .. append):gmatch("(.-)" .. delim) do
+		table.insert(result, match)
+	end
+	return result
+end
+
+M.appendRecuirePaths = function(p)
+	local list = M.split(package.path, ';')
 	for _,path in ipairs(p) do
 		table.insert(list, path.."/?.lua")
 		table.insert(list, path.."/?/init.lua")
@@ -50,6 +60,10 @@ end
 
 M.lerp = function(a, b, t)
 	return a + (b - a) * t
+end
+
+M.trim = function(str)
+	return str:gsub("^%s*(.-)%s*$", "%1")
 end
 
 return M
