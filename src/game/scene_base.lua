@@ -41,6 +41,12 @@ end
 function Scene:update_fixed(dt)
 end
 
+function Scene:on_window_resize(width, height)
+end
+
+function Scene:on_quit()
+end
+
 function Scene:attachEventListener(event_type)
 	local callback_name = 'on_'..event_type
 	love.ext.check(self[callback_name], "callback '"..callback_name.."' for scene '"..self.name.."' not found.", 2)

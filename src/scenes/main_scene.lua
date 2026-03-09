@@ -25,12 +25,20 @@ end
 function MainScene:update_fixed(dt)
 end
 
+function MainScene:on_window_resize(width, height)
+	log.info(tag, "window resize", width, height)
+end
+
 function MainScene:on_mouse_down(x, y, key, istouch, presses)
 	log.info(tag, "mouse down:", x, y, key)
 end
 
 function MainScene:on_key_down(key, scancode, isrepeat)
 	log.info(tag, "key down:", key)
+end
+
+function MainScene:on_quit()
+	log.info(tag, "quitting")
 end
 
 return MainScene

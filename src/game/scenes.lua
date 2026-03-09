@@ -1,7 +1,8 @@
 local love = require 'love'
 local g = love.graphics
 
-local registry = {}
+local class_registry = {}
+local scene_registry = {}
 local render_stack = {}
 local update_stack = {}
 local suspended = {}
@@ -23,7 +24,7 @@ end
 
 M.registerScene = function(scene_cls, scene_name)
 	local name = assert(scene_cls.name or scene_name)
-	registry[name] = scene_cls
+	class_registry[name] = scene_cls
 end
 
 M.getCurrent = function()
@@ -39,7 +40,7 @@ M.getByName = function(name)
 end
 
 M.loadScene = function(name, ...)
-	local scene_cls = love.ext.check(registry[name], "scene not found: " .. tostring(name), 2)
+	local scene_cls = love.ext.check(class_registry[name], "scene not found: " .. tostring(name), 2)
 	local current = M.getCurrent()
 	if current and current.fake then
 		pop_scene(render_stack, current)
@@ -49,6 +50,7 @@ M.loadScene = function(name, ...)
 	local scene = scene_cls(...)
 	log.info("[scenes]", "created scene: " .. name)
 	scene:load()
+	scene_registry[scene.name] = scene
 	push_scene(render_stack, scene)
 	push_scene(update_stack, scene)
 	return scene
@@ -66,6 +68,7 @@ M.switchScene = function(name, suspend_current)
 		else
 			log.info("[scenes]", "destroy scene: "..prev_scene.name)
 			prev_scene:release()
+			scene_registry[prev_scene.name] = nil
 		end
 		pop_scene(render_stack, prev_scene)
 		pop_scene(update_stack, prev_scene)
@@ -76,10 +79,11 @@ M.switchScene = function(name, suspend_current)
 		next_scene:resume()
 		log.info("[scenes]", "resumed scene: " .. name)
 	else
-		local scene_cls = assert(registry[name], "Scene not found: " .. tostring(name))
+		local scene_cls = assert(class_registry[name], "Scene not found: " .. tostring(name))
 		next_scene = scene_cls()
 		log.info("[scenes]", "created scene: " .. name)
 		next_scene:load()
+		scene_registry[next_scene.name] = next_scene
 	end
 	log.info("[scenes]", "switching to scene: " .. name)
 	push_scene(render_stack, next_scene)
@@ -116,6 +120,18 @@ function M.draw()
 			render_stack[i]:draw()
 		end
 	g.present()
+end
+
+function M.resize(w, h)
+	for _,scene in pairs(scene_registry) do
+		scene:on_window_resize(w, h)
+	end
+end
+
+function M.quit()
+	for _,scene in pairs(scene_registry) do
+		scene:on_quit()
+	end
 end
 
 return M

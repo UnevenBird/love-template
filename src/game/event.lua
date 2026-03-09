@@ -22,15 +22,6 @@ function callbacks.lowmemory()
 	collectgarbage()
 end
 
-function callbacks.resize(w, h)
-	collectgarbage()
-end
-
-function callbacks.quit()
-	log.info("[game]","quitting")
-	return true
-end
-
 local M = {}
 M.listeners = listeners
 M.callbacks = callbacks

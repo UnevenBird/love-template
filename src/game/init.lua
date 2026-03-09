@@ -1,6 +1,17 @@
 local event = require 'game.event'
 local scenes = require 'game.scenes'
 
+function event.callbacks.resize(w, h)
+	scenes.resize(w, h)
+	collectgarbage()
+end
+
+function event.callbacks.quit()
+	scenes.quit()
+	log.info("[game]","quitting")
+	return true
+end
+
 local game = {}
 game.attachEventListener = event.attachEventListener
 game.detachEventListener = event.detachEventListener
